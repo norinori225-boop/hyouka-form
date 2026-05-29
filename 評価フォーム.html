@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>訓練評価シート</title>
+  <style>
+    :root {
+      --red: #c0392b;
+      --green: #27ae60;
+      --yellow: #e67e22;
+      --gray: #95a5a6;
+      --bg: #f2f3f5;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #1f2937;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .app-header {
+      background: var(--red);
+      color: white;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    }
+    .app-header h1 { font-size: 15px; font-weight: 700; }
+    .score-pill {
+      background: rgba(255,255,255,.2);
+      border: 1.5px solid rgba(255,255,255,.5);
+      color: white;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .container { max-width: 600px; margin: 0 auto; padding: 14px 12px 40px; }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .card-head {
+      padding: 10px 14px;
+      background: #1e293b;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .card-body { padding: 14px; }
+    .field { margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 5px;
+      letter-spacing: .3px;
+    }
+    .field-row { display: flex; gap: 10px; }
+    .field-row .field { flex: 1; }
+    input[type=text], input[type=date], input[type=number], textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fafafa;
+      transition: border-color .15s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--red);
+      background: white;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 14px;
+      padding: 8px 14px;
+      background: #f8fafc;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .eval-item {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f3f5;
+    }
+    .eval-item:last-child { border-bottom: none; }
+    .item-text {
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.55;
+    }
+    .item-num {
+      display: inline-block;
+      background: #f1f3f5;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .btn-group { display: flex; gap: 6px; }
+    .eval-btn {
+      flex: 1;
+      padding: 9px 2px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all .12s ease;
+      color: var(--muted);
+      user-select: none;
+      line-height: 1.3;
+    }
+    .eval-btn:active { transform: scale(.95); }
+    .eval-btn small { font-size: 10px; font-weight: 400; display: block; }
+
+    .btn-a { border-color: #bbf7d0; color: var(--green); }
+    .btn-a.sel { background: var(--green); color: white; border-color: var(--green); }
+    .btn-b { border-color: #fed7aa; color: var(--yellow); }
+    .btn-b.sel { background: var(--yellow); color: white; border-color: var(--yellow); }
+    .btn-c { border-color: #fecaca; color: var(--red); }
+    .btn-c.sel { background: var(--red); color: white; border-color: var(--red); }
+    .btn-n { border-color: #e5e7eb; color: var(--gray); }
+    .btn-n.sel { background: var(--gray); color: white; border-color: var(--gray); }
+
+    .time-inputs { display: flex; align-items: center; gap: 6px; }
+    .time-inputs input { width: 64px; text-align: center; }
+    .time-colon { font-weight: 700; color: var(--muted); font-size: 18px; }
+    .time-unit { font-size: 11px; color: var(--muted); }
+
+    .score-box {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 16px 16px;
+      margin-bottom: 12px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .big-num {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+    }
+    .score-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-submit:not(:disabled):active { opacity: .85; }
+
+    .toast {
+      display: none;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .toast.ok { background: #dcfce7; color: #166534; display: block; }
+    .toast.err { background: #fee2e2; color: #991b1b; display: block; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #timer-bar {
+      position: sticky;
+      top: 46px;
+      z-index: 150;
+      background: white;
+      padding: 8px 12px 6px;
+      box-shadow: 0 3px 8px rgba(0,0,0,.18);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .te-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .te-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      transition: opacity .15s, transform .1s;
+      font-family: inherit;
+      text-align: center;
+      width: 100%;
+    }
+    .te-btn:active { transform: scale(.97); }
+    .te-btn.tdone { opacity: .72; }
+    .te-btn-label { display: block; }
+    .te-btn-time {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .5px;
+    }
+    .te-elapsed {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 0 4px 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .te-elapsed-val {
+      font-weight: 700;
+      color: var(--red);
+      font-size: 13px;
+      min-width: 76px;
+      text-align: right;
+    }
+    .te-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>🚑 訓練評価シート</h1>
+  <div class="score-pill" id="scoreHeader">採点中…</div>
+</div>
+
+<div id="timer-bar"></div>
+<div class="container" id="app"></div>
+
+<script>
+// ============================================================
+// ★★ ここを変更 ★★
+//   Google Apps Script をデプロイしたら、下のURLを書き換える
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw4urncVWS0hDaiVVRfjGwIbGRzkcaE5QZoFvlmQXo3EjOSvHVri_GYKj59W9hfTHs1/exec';
+
+// ============================================================
+// 評価セクション定義（Excelの評価表から）
+// ============================================================
+const SECTIONS = [
+  { id:'gen', title:'活動全般', icon:'🏃', items:[
+    'プロトコールを遵守した活動ができていたか',
+    '現場滞在時間の短縮に努めているか',
+    '隊の活動方針が隊員間で共有ができている',
+    '傷病者へ愛護的な対応をしている（粗暴な対応がないか）',
+  ]},
+  { id:'ini', title:'初期評価・観察', icon:'🔍', items:[
+    '気道・呼吸・循環・意識（ABCD）の評価は適切か',
+    '事案に合わせた観察ができているか',
+    '初期評価・観察結果の対応は適切か',
+  ]},
+  { id:'cpr', title:'ハイパフォーマンスCPR', icon:'💓', items:[
+    '人工呼吸・量・リズムは適正か',
+    '絶え間ない胸骨圧迫が出来ているか',
+    '胸骨圧迫・位置・深さ・リズムは適正か',
+    'パルスチェック、モニターチェックができているか',
+  ]},
+  { id:'spe', title:'特定行為等', icon:'💉', items:[
+    '特定行為の手技は適切か',
+    '特定行為の実施順位は適切か',
+    '特定行為による現場滞在時間延長はないか',
+    '傷病者や関係者にＩＣ（インフォームドコンセント）はとっているか',
+    '滴下速度や除細動の回数（難治性）を医師に確認しているか',
+  ]},
+  { id:'hos', title:'病院連絡', icon:'📞', items:[
+    '事案のキーワードを優先して伝えたか',
+    '情報提供の要点（MIST）を伝えたか',
+    '特定行為指示要請や救命士報告は適切か',
+    '医師へのプレゼンは適切か',
+    '自身の有資格について説明し、指示医師の名前を確認したか',
+  ]},
+  { id:'con', title:'説明と同意', icon:'🤝', items:[
+    '活動実施前に説明同意を得ているか',
+    '活動実施後に説明しているか',
+  ]},
+  { id:'m1', title:'隊員１', icon:'👤', items:[
+    '隊長や救命士が誤った活動を行った際に指摘することができた',
+    '隊長の指示が無くとも、活動方針に従い能動的に活動できた',
+    '実施したことを隊長に報告することができた',
+  ]},
+  { id:'m2', title:'隊員２', icon:'👥', items:[
+    '隊長や救命士が誤った活動を行った際に指摘することができた',
+    '隊長の指示が無くとも、活動方針に従い能動的に活動できた',
+    '実施したことを隊長に報告することができた',
+  ]},
+];
+
+// ============================================================
+// 状態管理
+// ============================================================
+const answers = {}; // "secId_idx" → "A"|"B"|"C"|"N"
+
+// タイマー状態
+const timers = { contact: null, depart: null, sceneOut: null, hospital: null };
+
+function recordTime(key) {
+  timers[key] = new Date();
+  updateTimerDisplay();
+}
+
+function fmtHMS(d) {
+  if (!d) return '──';
+  return d.toTimeString().slice(0, 8);
+}
+
+function calcElapsed(from, to) {
+  if (!from || !to) return null;
+  const diff = Math.floor((to - from) / 1000);
+  return { m: Math.floor(diff / 60), s: diff % 60, total: diff };
+}
+
+function fmtElapsed(e) {
+  if (!e) return '──';
+  return `${e.m}分${String(e.s).padStart(2, '0')}秒`;
+}
+
+function updateTimerDisplay() {
+  ['contact', 'depart', 'sceneOut', 'hospital'].forEach(key => {
+    const timeEl = document.getElementById(`tt-${key}`);
+    const btn    = document.getElementById(`tb-${key}`);
+    if (timeEl) timeEl.textContent = fmtHMS(timers[key]);
+    if (btn && timers[key]) btn.classList.add('tdone');
+  });
+  const el1 = document.getElementById('te-1');
+  const el2 = document.getElementById('te-2');
+  if (el1) el1.textContent = fmtElapsed(calcElapsed(timers.contact, timers.depart));
+  if (el2) el2.textContent = fmtElapsed(calcElapsed(timers.depart, timers.sceneOut));
+}
+
+function calcScore() {
+  let score = 0, max = 0;
+  SECTIONS.forEach(sec => {
+    sec.items.forEach((_, i) => {
+      const v = answers[`${sec.id}_${i}`];
+      if (v === 'N') return; // 非該当はスキップ
+      max += 2;
+      if (v === 'A') score += 2;
+      else if (v === 'B') score += 1;
+      // C or 未回答 = 0点
+    });
+  });
+  return { score, max };
+}
+
+function countAnswered() {
+  let answered = 0, total = 0;
+  SECTIONS.forEach(sec => {
+    sec.items.forEach((_, i) => {
+      total++;
+      if (answers[`${sec.id}_${i}`]) answered++;
+    });
+  });
+  return { answered, total };
+}
+
+function updateScoreDisplay() {
+  const { score, max } = calcScore();
+  const { answered, total } = countAnswered();
+  const pct = max > 0 ? Math.round(score / max * 100) : 0;
+
+  document.getElementById('scoreHeader').textContent = `${score} / ${max}点`;
+  const bigEl = document.getElementById('bigScore');
+  const subEl = document.getElementById('scoreSub');
+  if (bigEl) {
+    bigEl.textContent = score;
+    subEl.textContent = `/ ${max}点（${pct}%）　回答済 ${answered} / ${total}項目`;
+  }
+}
+
+// ============================================================
+// UI 構築
+// ============================================================
+function buildBasicInfo() {
+  const today = new Date().toLocaleDateString('sv'); // YYYY-MM-DD
+  return `
+  <div class="card">
+    <div class="card-head">📋 基本情報</div>
+    <div class="card-body">
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">実施日</div>
+          <input type="date" id="date" value="${today}">
+        </div>
+        <div class="field">
+          <div class="field-label">実施隊（第 X 部）</div>
+          <input type="text" id="unit" placeholder="例：第３部">
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">隊長</div>
+        <input type="text" id="leader" placeholder="氏名">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">隊員１</div>
+          <input type="text" id="member1" placeholder="氏名">
+        </div>
+        <div class="field">
+          <div class="field-label">隊員２</div>
+          <input type="text" id="member2" placeholder="氏名">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">評価者</div>
+          <input type="text" id="evaluator" placeholder="氏名">
+        </div>
+        <div class="field">
+          <div class="field-label">所属</div>
+          <input type="text" id="evaluatorOrg" placeholder="消防署等">
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildSection(sec) {
+  const items = sec.items.map((text, i) => {
+    const key = `${sec.id}_${i}`;
+    return `
+    <div class="eval-item">
+      <div class="item-text"><span class="item-num">${i+1}</span>${text}</div>
+      <div class="btn-group">
+        <button class="eval-btn btn-a" data-key="${key}" data-val="A">A<small>適切</small></button>
+        <button class="eval-btn btn-b" data-key="${key}" data-val="B">B<small>不十分</small></button>
+        <button class="eval-btn btn-c" data-key="${key}" data-val="C">C<small>不適切</small></button>
+        <button class="eval-btn btn-n" data-key="${key}" data-val="N">ー<small>非該当</small></button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+  <div class="card">
+    <div class="card-head">${sec.icon} ${sec.title}</div>
+    ${items}
+  </div>`;
+}
+
+function buildTimerCard() {
+  function teBtn(key, icon, label, color) {
+    return `<button class="te-btn" id="tb-${key}" style="background:${color}"
+      onclick="recordTime('${key}')">
+      <span class="te-btn-label">${icon} ${label}</span>
+      <span class="te-btn-time" id="tt-${key}">──</span>
+    </button>`;
+  }
+  function teElapsed(id, label) {
+    return `<div class="te-elapsed"><span>${label}</span><span class="te-elapsed-val" id="${id}">──</span></div>`;
+  }
+  return `
+    <div style="display:flex;gap:8px;margin-bottom:2px">
+      ${teBtn('contact',  '🤝', '接　触', '#2563eb')}
+      ${teBtn('depart',   '👋', '離　脱', '#7c3aed')}
+    </div>
+    ${teElapsed('te-1', '接触 〜 離脱')}
+    <div style="display:flex;gap:8px;margin-bottom:2px">
+      ${teBtn('sceneOut', '🚑', '現場出発', '#c0392b')}
+      ${teBtn('hospital', '🏥', '病　着',   '#27ae60')}
+    </div>
+    ${teElapsed('te-2', '離脱 〜 現場出発')}`;
+}
+
+function buildCommentCard() {
+  return `
+  <div class="card">
+    <div class="card-head">📝 総括コメント</div>
+    <div class="card-body">
+      <textarea id="comment" placeholder="総合的な評価コメントを入力してください..."></textarea>
+    </div>
+  </div>`;
+}
+
+function buildSubmitArea() {
+  return `
+  <div class="score-box">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:4px">現在の得点</div>
+    <div class="big-num" id="bigScore">0</div>
+    <div class="score-sub" id="scoreSub">/ 0点（0%）　回答済 0 / 34項目</div>
+  </div>
+  <button class="btn-submit" id="btnSubmit" onclick="submitForm()">📤 採点結果を送信する</button>
+  <div class="toast" id="toast"></div>`;
+}
+
+function buildLegend() {
+  return `<div class="legend">
+    <span>🟢 <b>A</b>：適切（2点）</span>
+    <span>🟡 <b>B</b>：不十分（1点）</span>
+    <span>🔴 <b>C</b>：不適切（0点）</span>
+    <span>⬜ <b>ー</b>：非該当（採点対象外）</span>
+  </div>`;
+}
+
+function buildApp() {
+  document.getElementById('timer-bar').innerHTML = buildTimerCard();
+
+  const app = document.getElementById('app');
+  app.innerHTML =
+    buildBasicInfo() +
+    buildLegend() +
+    SECTIONS.map(buildSection).join('') +
+    buildCommentCard() +
+    buildSubmitArea();
+
+  // A/B/C/ー ボタンのイベント
+  document.querySelectorAll('.eval-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const val = btn.dataset.val;
+      if (answers[key] === val) {
+        delete answers[key];
+        document.querySelectorAll(`[data-key="${key}"]`).forEach(b => b.classList.remove('sel'));
+      } else {
+        answers[key] = val;
+        document.querySelectorAll(`[data-key="${key}"]`).forEach(b => {
+          b.classList.toggle('sel', b.dataset.val === val);
+        });
+      }
+      updateScoreDisplay();
+    });
+  });
+
+  updateScoreDisplay();
+}
+
+// ============================================================
+// 送信処理
+// ============================================================
+async function submitForm() {
+  const btn = document.getElementById('btnSubmit');
+  const toast = document.getElementById('toast');
+
+  const date = document.getElementById('date').value;
+  const unit = document.getElementById('unit').value.trim();
+  if (!date || !unit) {
+    showToast('err', '⚠️ 実施日と実施隊（第X部）を入力してから送信してください。');
+    return;
+  }
+
+  const { score, max } = calcScore();
+  const pct = max > 0 ? Math.round(score / max * 100) : 0;
+
+  // 各項目をフラットな配列に
+  const itemValues = [];
+  SECTIONS.forEach(sec => {
+    sec.items.forEach((text, i) => {
+      itemValues.push({
+        section: sec.title,
+        item: text,
+        value: answers[`${sec.id}_${i}`] || '未回答'
+      });
+    });
+  });
+
+  const payload = {
+    submittedAt: new Date().toLocaleString('ja-JP'),
+    date,
+    unit,
+    leader:       document.getElementById('leader').value.trim(),
+    member1:      document.getElementById('member1').value.trim(),
+    member2:      document.getElementById('member2').value.trim(),
+    evaluator:    document.getElementById('evaluator').value.trim(),
+    evaluatorOrg: document.getElementById('evaluatorOrg').value.trim(),
+    items: itemValues,
+    timerContact:  fmtHMS(timers.contact),
+    timerDepart:   fmtHMS(timers.depart),
+    timerSceneOut: fmtHMS(timers.sceneOut),
+    timerHospital: fmtHMS(timers.hospital),
+    elapsed1: fmtElapsed(calcElapsed(timers.contact, timers.depart)),
+    elapsed2: fmtElapsed(calcElapsed(timers.depart,  timers.sceneOut)),
+    score,
+    maxScore: max,
+    pct,
+    comment: document.getElementById('comment').value.trim(),
+  };
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>送信中...';
+  toast.className = 'toast';
+
+  try {
+    // GAS Web App へ送信（no-cors でレスポンスは読めないが記録される）
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    showToast('ok',
+      `✅ 送信完了！\n得点：${score} / ${max}点（${pct}%）\n実施隊：${unit}`
+    );
+    btn.innerHTML = '✅ 送信済み';
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '📤 採点結果を送信する';
+    showToast('err', `❌ 送信に失敗しました。\nWi-Fi／通信状況を確認してください。\n${err.message}`);
+  }
+}
+
+function showToast(type, msg) {
+  const t = document.getElementById('toast');
+  t.className = `toast ${type}`;
+  t.style.whiteSpace = 'pre-line';
+  t.textContent = msg;
+  t.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// 起動
+buildApp();
+</script>
+</body>
+</html>
