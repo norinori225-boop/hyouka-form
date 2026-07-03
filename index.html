@@ -24,8 +24,8 @@
       line-height: 1.5;
     }
     .app-header {
-      background: var(--red);
-      color: white;
+      background: #1565C0;
+      color: #ffffff;
       padding: 12px 16px;
       position: sticky;
       top: 0;
@@ -397,8 +397,29 @@ function buildBasicInfo() {
           <input type="date" id="date" value="${today}">
         </div>
         <div class="field">
-          <div class="field-label">実施隊（〇〇署）</div>
-          <input type="text" id="unit" placeholder="例：〇〇署">
+          <div class="field-label">実施隊</div>
+          <select id="unit">
+            <option value="">選択</option>
+            <option value="沼津北１">沼津北１</option>
+            <option value="沼津北２">沼津北２</option>
+            <option value="原">原</option>
+            <option value="沼津南">沼津南</option>
+            <option value="静浦">静浦</option>
+            <option value="西浦">西浦</option>
+            <option value="戸田">戸田</option>
+            <option value="清水町１">清水町１</option>
+            <option value="清水町２">清水町２</option>
+            <option value="田方北">田方北</option>
+            <option value="田方中１">田方中１</option>
+            <option value="田方中２">田方中２</option>
+            <option value="田方南">田方南</option>
+            <option value="田方西">田方西</option>
+            <option value="伊東">伊東</option>
+            <option value="八幡野">八幡野</option>
+            <option value="宇佐美">宇佐美</option>
+            <option value="吉田">吉田</option>
+            <option value="東伊豆">東伊豆</option>
+          </select>
         </div>
         <div class="field">
           <div class="field-label">部</div>
