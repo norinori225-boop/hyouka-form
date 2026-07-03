@@ -8,7 +8,6 @@
     :root {
       --red: #c0392b;
       --green: #27ae60;
-      --yellow: #e67e22;
       --gray: #95a5a6;
       --bg: #f2f3f5;
       --card: #ffffff;
@@ -76,8 +75,9 @@
       letter-spacing: .3px;
     }
     .field-row { display: flex; gap: 10px; }
-    .field-row .field { flex: 1; }
-    input[type=text], input[type=date], input[type=number], textarea {
+    .field-row .field { flex: 1; margin-bottom: 12px; }
+    .field-row:last-child .field { margin-bottom: 0; }
+    input[type=text], input[type=date], input[type=number], select, textarea {
       width: 100%;
       border: 1.5px solid var(--border);
       border-radius: 8px;
@@ -88,7 +88,8 @@
       background: #fafafa;
       transition: border-color .15s;
     }
-    input:focus, textarea:focus {
+    select { appearance: none; background-image: none; }
+    input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--red);
       background: white;
@@ -103,37 +104,42 @@
       font-size: 11px;
       color: var(--muted);
       margin-bottom: 4px;
+      border-radius: 8px;
     }
+
+    /* ---- 評価カード ---- */
     .eval-item {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f1f3f5;
+      padding: 14px;
     }
-    .eval-item:last-child { border-bottom: none; }
-    .item-text {
-      font-size: 13px;
-      color: var(--text);
-      margin-bottom: 8px;
-      line-height: 1.55;
+    .criteria {
+      list-style: none;
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border-radius: 8px;
     }
-    .item-num {
-      display: inline-block;
-      background: #f1f3f5;
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-size: 10px;
+    .criteria li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 12px;
       color: var(--muted);
-      font-weight: 700;
-      margin-right: 4px;
-      vertical-align: middle;
+      line-height: 1.6;
     }
-    .btn-group { display: flex; gap: 6px; }
+    .criteria li::before {
+      content: '・';
+      position: absolute;
+      left: 2px;
+      color: #cbd5e1;
+    }
+
+    .btn-group { display: flex; gap: 8px; }
     .eval-btn {
       flex: 1;
-      padding: 9px 2px;
+      padding: 11px 2px;
       border: 2px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       background: white;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
@@ -143,37 +149,13 @@
       line-height: 1.3;
     }
     .eval-btn:active { transform: scale(.95); }
-    .eval-btn small { font-size: 10px; font-weight: 400; display: block; }
 
-    .btn-a { border-color: #bbf7d0; color: var(--green); }
-    .btn-a.sel { background: var(--green); color: white; border-color: var(--green); }
-    .btn-b { border-color: #fed7aa; color: var(--yellow); }
-    .btn-b.sel { background: var(--yellow); color: white; border-color: var(--yellow); }
-    .btn-c { border-color: #fecaca; color: var(--red); }
-    .btn-c.sel { background: var(--red); color: white; border-color: var(--red); }
-    .btn-n { border-color: #e5e7eb; color: var(--gray); }
-    .btn-n.sel { background: var(--gray); color: white; border-color: var(--gray); }
-
-    .time-inputs { display: flex; align-items: center; gap: 6px; }
-    .time-inputs input { width: 64px; text-align: center; }
-    .time-colon { font-weight: 700; color: var(--muted); font-size: 18px; }
-    .time-unit { font-size: 11px; color: var(--muted); }
-
-    .score-box {
-      background: white;
-      border-radius: 12px;
-      padding: 20px 16px 16px;
-      margin-bottom: 12px;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,.08);
-    }
-    .big-num {
-      font-size: 56px;
-      font-weight: 800;
-      color: var(--red);
-      line-height: 1;
-    }
-    .score-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .btn-ok { border-color: #bbf7d0; color: var(--green); }
+    .btn-ok.sel { background: var(--green); color: white; border-color: var(--green); }
+    .btn-ng { border-color: #fecaca; color: var(--red); }
+    .btn-ng.sel { background: var(--red); color: white; border-color: var(--red); }
+    .btn-na { border-color: #e5e7eb; color: var(--gray); }
+    .btn-na.sel { background: var(--gray); color: white; border-color: var(--gray); }
 
     .btn-submit {
       width: 100%;
@@ -225,12 +207,6 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .te-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
     .te-btn {
       flex: 1;
       padding: 9px 8px;
@@ -271,19 +247,27 @@
       min-width: 76px;
       text-align: right;
     }
-    .te-note {
-      font-size: 11px;
+
+    .app-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px 8px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
       color: var(--muted);
-      margin-bottom: 12px;
-      line-height: 1.5;
+      font-size: 11px;
     }
+    .app-footer .sep { color: var(--border); }
   </style>
 </head>
 <body>
 
 <div class="app-header">
   <h1>🚑 訓練評価シート</h1>
-  <div class="score-pill" id="scoreHeader">採点中…</div>
+  <div class="score-pill" id="scoreHeader">0 / 6 項目</div>
 </div>
 
 <div id="timer-bar"></div>
@@ -297,60 +281,58 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbw4urncVWS0hDaiVVRfjGwIbGRzkcaE5QZoFvlmQXo3EjOSvHVri_GYKj59W9hfTHs1/exec';
 
 // ============================================================
-// 評価セクション定義（Excelの評価表から）
+// 評価セクション定義（大項目のみ・3段階評価）
+//   points … 評価の目安（採点対象外の参考項目）
 // ============================================================
 const SECTIONS = [
-  { id:'gen', title:'活動全般', icon:'🏃', items:[
+  { id:'gen', title:'活動全般', icon:'🏃', points:[
     'プロトコールを遵守した活動ができていたか',
     '現場滞在時間の短縮に努めているか',
     '隊の活動方針が隊員間で共有ができている',
-    '傷病者へ愛護的な対応をしている（粗暴な対応がないか）',
+    '温かい人間愛と思いやりの心をもって対応している',
   ]},
-  { id:'ini', title:'初期評価・観察', icon:'🔍', items:[
+  { id:'ini', title:'初期評価・観察', icon:'🔍', points:[
     '気道・呼吸・循環・意識（ABCD）の評価は適切か',
     '事案に合わせた観察ができているか',
     '初期評価・観察結果の対応は適切か',
   ]},
-  { id:'cpr', title:'ハイパフォーマンスCPR', icon:'💓', items:[
+  { id:'cpr', title:'ハイパフォーマンスCPR', icon:'💓', points:[
     '人工呼吸・量・リズムは適正か',
     '絶え間ない胸骨圧迫が出来ているか',
     '胸骨圧迫・位置・深さ・リズムは適正か',
     'パルスチェック、モニターチェックができているか',
   ]},
-  { id:'spe', title:'特定行為等', icon:'💉', items:[
+  { id:'spe', title:'特定行為等', icon:'💉', points:[
     '特定行為の手技は適切か',
     '特定行為の実施順位は適切か',
     '特定行為による現場滞在時間延長はないか',
     '傷病者や関係者にＩＣ（インフォームドコンセント）はとっているか',
     '滴下速度や除細動の回数（難治性）を医師に確認しているか',
   ]},
-  { id:'hos', title:'病院連絡', icon:'📞', items:[
+  { id:'hos', title:'病院連絡', icon:'📞', points:[
     '事案のキーワードを優先して伝えたか',
     '情報提供の要点（MIST）を伝えたか',
     '特定行為指示要請や救命士報告は適切か',
     '医師へのプレゼンは適切か',
     '自身の有資格について説明し、指示医師の名前を確認したか',
   ]},
-  { id:'con', title:'説明と同意', icon:'🤝', items:[
+  { id:'con', title:'説明と同意', icon:'🤝', points:[
     '活動実施前に説明同意を得ているか',
     '活動実施後に説明しているか',
   ]},
-  { id:'m1', title:'隊員１', icon:'👤', items:[
-    '隊長や救命士が誤った活動を行った際に指摘することができた',
-    '隊長の指示が無くとも、活動方針に従い能動的に活動できた',
-    '実施したことを隊長に報告することができた',
-  ]},
-  { id:'m2', title:'隊員２', icon:'👥', items:[
-    '隊長や救命士が誤った活動を行った際に指摘することができた',
-    '隊長の指示が無くとも、活動方針に従い能動的に活動できた',
-    '実施したことを隊長に報告することができた',
-  ]},
+];
+
+// 評価の選択肢
+const CHOICES = [
+  { val:'適切',   cls:'btn-ok' },
+  { val:'不適切', cls:'btn-ng' },
+  { val:'該当なし', cls:'btn-na' },
 ];
 
 // ============================================================
 // 状態管理
 // ============================================================
-const answers = {}; // "secId_idx" → "A"|"B"|"C"|"N"
+const answers = {}; // secId → "適切"|"不適切"|"該当なし"
 
 // タイマー状態
 const timers = { contact: null, depart: null, sceneOut: null, hospital: null };
@@ -389,44 +371,15 @@ function updateTimerDisplay() {
   if (el2) el2.textContent = fmtElapsed(calcElapsed(timers.depart, timers.sceneOut));
 }
 
-function calcScore() {
-  let score = 0, max = 0;
-  SECTIONS.forEach(sec => {
-    sec.items.forEach((_, i) => {
-      const v = answers[`${sec.id}_${i}`];
-      if (v === 'N') return; // 非該当はスキップ
-      max += 2;
-      if (v === 'A') score += 2;
-      else if (v === 'B') score += 1;
-      // C or 未回答 = 0点
-    });
-  });
-  return { score, max };
-}
-
 function countAnswered() {
-  let answered = 0, total = 0;
-  SECTIONS.forEach(sec => {
-    sec.items.forEach((_, i) => {
-      total++;
-      if (answers[`${sec.id}_${i}`]) answered++;
-    });
-  });
-  return { answered, total };
+  let answered = 0;
+  SECTIONS.forEach(sec => { if (answers[sec.id]) answered++; });
+  return { answered, total: SECTIONS.length };
 }
 
-function updateScoreDisplay() {
-  const { score, max } = calcScore();
+function updateProgress() {
   const { answered, total } = countAnswered();
-  const pct = max > 0 ? Math.round(score / max * 100) : 0;
-
-  document.getElementById('scoreHeader').textContent = `${score} / ${max}点`;
-  const bigEl = document.getElementById('bigScore');
-  const subEl = document.getElementById('scoreSub');
-  if (bigEl) {
-    bigEl.textContent = score;
-    subEl.textContent = `/ ${max}点（${pct}%）　回答済 ${answered} / ${total}項目`;
-  }
+  document.getElementById('scoreHeader').textContent = `${answered} / ${total} 項目`;
 }
 
 // ============================================================
@@ -444,15 +397,24 @@ function buildBasicInfo() {
           <input type="date" id="date" value="${today}">
         </div>
         <div class="field">
-          <div class="field-label">実施隊（第 X 部）</div>
-          <input type="text" id="unit" placeholder="例：第３部">
+          <div class="field-label">実施隊（〇〇署）</div>
+          <input type="text" id="unit" placeholder="例：〇〇署">
+        </div>
+        <div class="field">
+          <div class="field-label">部</div>
+          <select id="bu">
+            <option value="">選択</option>
+            <option value="1部">1部</option>
+            <option value="2部">2部</option>
+            <option value="3部">3部</option>
+          </select>
         </div>
       </div>
-      <div class="field">
-        <div class="field-label">隊長</div>
-        <input type="text" id="leader" placeholder="氏名">
-      </div>
       <div class="field-row">
+        <div class="field">
+          <div class="field-label">隊長</div>
+          <input type="text" id="leader" placeholder="氏名">
+        </div>
         <div class="field">
           <div class="field-label">隊員１</div>
           <input type="text" id="member1" placeholder="氏名">
@@ -467,33 +429,23 @@ function buildBasicInfo() {
           <div class="field-label">評価者</div>
           <input type="text" id="evaluator" placeholder="氏名">
         </div>
-        <div class="field">
-          <div class="field-label">所属</div>
-          <input type="text" id="evaluatorOrg" placeholder="消防署等">
-        </div>
       </div>
     </div>
   </div>`;
 }
 
 function buildSection(sec) {
-  const items = sec.items.map((text, i) => {
-    const key = `${sec.id}_${i}`;
-    return `
-    <div class="eval-item">
-      <div class="item-text"><span class="item-num">${i+1}</span>${text}</div>
-      <div class="btn-group">
-        <button class="eval-btn btn-a" data-key="${key}" data-val="A">A<small>適切</small></button>
-        <button class="eval-btn btn-b" data-key="${key}" data-val="B">B<small>不十分</small></button>
-        <button class="eval-btn btn-c" data-key="${key}" data-val="C">C<small>不適切</small></button>
-        <button class="eval-btn btn-n" data-key="${key}" data-val="N">ー<small>非該当</small></button>
-      </div>
-    </div>`;
-  }).join('');
+  const points = sec.points.map(p => `<li>${p}</li>`).join('');
+  const btns = CHOICES.map(c =>
+    `<button class="eval-btn ${c.cls}" data-key="${sec.id}" data-val="${c.val}">${c.val}</button>`
+  ).join('');
   return `
   <div class="card">
     <div class="card-head">${sec.icon} ${sec.title}</div>
-    ${items}
+    <div class="eval-item">
+      <ul class="criteria">${points}</ul>
+      <div class="btn-group">${btns}</div>
+    </div>
   </div>`;
 }
 
@@ -533,21 +485,26 @@ function buildCommentCard() {
 
 function buildSubmitArea() {
   return `
-  <div class="score-box">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:4px">現在の得点</div>
-    <div class="big-num" id="bigScore">0</div>
-    <div class="score-sub" id="scoreSub">/ 0点（0%）　回答済 0 / 34項目</div>
-  </div>
-  <button class="btn-submit" id="btnSubmit" onclick="submitForm()">📤 採点結果を送信する</button>
+  <button class="btn-submit" id="btnSubmit" onclick="submitForm()">📤 評価結果を送信する</button>
   <div class="toast" id="toast"></div>`;
+}
+
+function buildFooter() {
+  return `
+  <div class="app-footer">
+    <span>駿東伊豆消防本部</span>
+    <span class="sep">/</span>
+    <span>Ver.2.0</span>
+    <span class="sep">/</span>
+    <span>2026年7月</span>
+  </div>`;
 }
 
 function buildLegend() {
   return `<div class="legend">
-    <span>🟢 <b>A</b>：適切（2点）</span>
-    <span>🟡 <b>B</b>：不十分（1点）</span>
-    <span>🔴 <b>C</b>：不適切（0点）</span>
-    <span>⬜ <b>ー</b>：非該当（採点対象外）</span>
+    <span>🟢 <b>適切</b></span>
+    <span>🔴 <b>不適切</b></span>
+    <span>⬜ <b>該当なし</b></span>
   </div>`;
 }
 
@@ -560,9 +517,10 @@ function buildApp() {
     buildLegend() +
     SECTIONS.map(buildSection).join('') +
     buildCommentCard() +
-    buildSubmitArea();
+    buildSubmitArea() +
+    buildFooter();
 
-  // A/B/C/ー ボタンのイベント
+  // 適切／不適切／該当なし ボタンのイベント
   document.querySelectorAll('.eval-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const key = btn.dataset.key;
@@ -576,11 +534,11 @@ function buildApp() {
           b.classList.toggle('sel', b.dataset.val === val);
         });
       }
-      updateScoreDisplay();
+      updateProgress();
     });
   });
 
-  updateScoreDisplay();
+  updateProgress();
 }
 
 // ============================================================
@@ -592,35 +550,27 @@ async function submitForm() {
 
   const date = document.getElementById('date').value;
   const unit = document.getElementById('unit').value.trim();
-  if (!date || !unit) {
-    showToast('err', '⚠️ 実施日と実施隊（第X部）を入力してから送信してください。');
+  const bu   = document.getElementById('bu').value;
+  if (!date || !unit || !bu) {
+    showToast('err', '⚠️ 実施日・実施隊・部を入力してから送信してください。');
     return;
   }
 
-  const { score, max } = calcScore();
-  const pct = max > 0 ? Math.round(score / max * 100) : 0;
-
   // 各項目をフラットな配列に
-  const itemValues = [];
-  SECTIONS.forEach(sec => {
-    sec.items.forEach((text, i) => {
-      itemValues.push({
-        section: sec.title,
-        item: text,
-        value: answers[`${sec.id}_${i}`] || '未回答'
-      });
-    });
-  });
+  const itemValues = SECTIONS.map(sec => ({
+    section: sec.title,
+    value: answers[sec.id] || '未評価',
+  }));
 
   const payload = {
     submittedAt: new Date().toLocaleString('ja-JP'),
     date,
     unit,
-    leader:       document.getElementById('leader').value.trim(),
-    member1:      document.getElementById('member1').value.trim(),
-    member2:      document.getElementById('member2').value.trim(),
-    evaluator:    document.getElementById('evaluator').value.trim(),
-    evaluatorOrg: document.getElementById('evaluatorOrg').value.trim(),
+    bu,
+    leader:    document.getElementById('leader').value.trim(),
+    member1:   document.getElementById('member1').value.trim(),
+    member2:   document.getElementById('member2').value.trim(),
+    evaluator: document.getElementById('evaluator').value.trim(),
     items: itemValues,
     timerContact:  fmtHMS(timers.contact),
     timerDepart:   fmtHMS(timers.depart),
@@ -628,9 +578,6 @@ async function submitForm() {
     timerHospital: fmtHMS(timers.hospital),
     elapsed1: fmtElapsed(calcElapsed(timers.contact, timers.depart)),
     elapsed2: fmtElapsed(calcElapsed(timers.depart,  timers.sceneOut)),
-    score,
-    maxScore: max,
-    pct,
     comment: document.getElementById('comment').value.trim(),
   };
 
@@ -647,12 +594,12 @@ async function submitForm() {
       body: JSON.stringify(payload),
     });
     showToast('ok',
-      `✅ 送信完了！\n得点：${score} / ${max}点（${pct}%）\n実施隊：${unit}`
+      `✅ 送信完了！\n実施隊：${unit} ${bu}`
     );
     btn.innerHTML = '✅ 送信済み';
   } catch (err) {
     btn.disabled = false;
-    btn.innerHTML = '📤 採点結果を送信する';
+    btn.innerHTML = '📤 評価結果を送信する';
     showToast('err', `❌ 送信に失敗しました。\nWi-Fi／通信状況を確認してください。\n${err.message}`);
   }
 }
