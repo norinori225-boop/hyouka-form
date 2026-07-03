@@ -74,11 +74,12 @@
       margin-bottom: 5px;
       letter-spacing: .3px;
     }
-    .field-row { display: flex; gap: 10px; }
-    .field-row .field { flex: 1; margin-bottom: 12px; }
+    .field-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .field-row .field { flex: 1 1 140px; min-width: 0; margin-bottom: 12px; }
     .field-row:last-child .field { margin-bottom: 0; }
     input[type=text], input[type=date], input[type=number], select, textarea {
       width: 100%;
+      min-width: 0;
       border: 1.5px solid var(--border);
       border-radius: 8px;
       padding: 9px 12px;
