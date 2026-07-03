@@ -392,11 +392,11 @@ function buildBasicInfo() {
   <div class="card">
     <div class="card-head">📋 基本情報</div>
     <div class="card-body">
+      <div class="field">
+        <div class="field-label">実施日</div>
+        <input type="date" id="date" value="${today}">
+      </div>
       <div class="field-row">
-        <div class="field">
-          <div class="field-label">実施日</div>
-          <input type="date" id="date" value="${today}">
-        </div>
         <div class="field">
           <div class="field-label">実施隊</div>
           <select id="unit">
@@ -434,9 +434,15 @@ function buildBasicInfo() {
       </div>
       <div class="field-row">
         <div class="field">
+          <div class="field-label">評価者</div>
+          <input type="text" id="evaluator" placeholder="氏名">
+        </div>
+        <div class="field">
           <div class="field-label">隊長</div>
           <input type="text" id="leader" placeholder="氏名">
         </div>
+      </div>
+      <div class="field-row">
         <div class="field">
           <div class="field-label">隊員１</div>
           <input type="text" id="member1" placeholder="氏名">
@@ -444,12 +450,6 @@ function buildBasicInfo() {
         <div class="field">
           <div class="field-label">隊員２</div>
           <input type="text" id="member2" placeholder="氏名">
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <div class="field-label">評価者</div>
-          <input type="text" id="evaluator" placeholder="氏名">
         </div>
       </div>
     </div>
