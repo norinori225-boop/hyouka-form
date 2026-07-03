@@ -174,6 +174,22 @@
     .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
     .btn-submit:not(:disabled):active { opacity: .85; }
 
+    .btn-next {
+      width: 100%;
+      margin-top: 12px;
+      padding: 16px;
+      background: #1565C0;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn-next:active { opacity: .85; }
+
     .toast {
       display: none;
       margin-top: 12px;
@@ -279,7 +295,7 @@
 // ★★ ここを変更 ★★
 //   Google Apps Script をデプロイしたら、下のURLを書き換える
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbw4urncVWS0hDaiVVRfjGwIbGRzkcaE5QZoFvlmQXo3EjOSvHVri_GYKj59W9hfTHs1/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzKNv23jyBRx7H0351wacf2n5mC_i8LMVsFzihmIt0dqQEHvPvBc6XgTFQsqA45Icz_/exec';
 
 // ============================================================
 // 評価セクション定義（大項目のみ・3段階評価）
@@ -508,7 +524,8 @@ function buildCommentCard() {
 function buildSubmitArea() {
   return `
   <button class="btn-submit" id="btnSubmit" onclick="submitForm()">📤 評価結果を送信する</button>
-  <div class="toast" id="toast"></div>`;
+  <div class="toast" id="toast"></div>
+  <button class="btn-next" id="btnNext" style="display:none" onclick="nextScenario()">➡️ 次の想定へ（新しい評価を開始）</button>`;
 }
 
 function buildFooter() {
@@ -619,11 +636,33 @@ async function submitForm() {
       `✅ 送信完了！\n実施隊：${unit} ${bu}`
     );
     btn.innerHTML = '✅ 送信済み';
+    document.getElementById('btnNext').style.display = 'block';
   } catch (err) {
     btn.disabled = false;
     btn.innerHTML = '📤 評価結果を送信する';
     showToast('err', `❌ 送信に失敗しました。\nWi-Fi／通信状況を確認してください。\n${err.message}`);
   }
+}
+
+// ============================================================
+//  次の想定へ（評価者氏名だけ引き継いでリセット）
+// ============================================================
+function nextScenario() {
+  // 引き継ぐ値を退避
+  const keepEvaluator = document.getElementById('evaluator').value;
+
+  // 評価・タイマーの状態をクリア
+  Object.keys(answers).forEach(k => delete answers[k]);
+  timers.contact = timers.depart = timers.sceneOut = timers.hospital = null;
+
+  // 画面を最初から作り直す（入力欄・ボタン状態もすべて初期化）
+  buildApp();
+
+  // 評価者氏名だけ復元
+  document.getElementById('evaluator').value = keepEvaluator;
+
+  // 先頭までスクロール
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showToast(type, msg) {
