@@ -133,14 +133,14 @@
       color: #cbd5e1;
     }
 
-    .btn-group { display: flex; gap: 8px; }
+    .btn-group { display: flex; gap: 6px; }
     .eval-btn {
       flex: 1;
-      padding: 11px 2px;
+      padding: 11px 1px;
       border: 2px solid var(--border);
       border-radius: 10px;
       background: white;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
@@ -148,11 +148,14 @@
       color: var(--muted);
       user-select: none;
       line-height: 1.3;
+      white-space: nowrap;
     }
     .eval-btn:active { transform: scale(.95); }
 
     .btn-ok { border-color: #bbf7d0; color: var(--green); }
     .btn-ok.sel { background: var(--green); color: white; border-color: var(--green); }
+    .btn-mid { border-color: #fde68a; color: #d97706; }
+    .btn-mid.sel { background: #f59e0b; color: white; border-color: #f59e0b; }
     .btn-ng { border-color: #fecaca; color: var(--red); }
     .btn-ng.sel { background: var(--red); color: white; border-color: var(--red); }
     .btn-na { border-color: #e5e7eb; color: var(--gray); }
@@ -308,10 +311,10 @@ const SECTIONS = [
     '隊の活動方針が隊員間で共有ができている',
     '温かい人間愛と思いやりの心をもって対応している',
   ]},
-  { id:'ini', title:'初期評価・観察', icon:'🔍', points:[
+  { id:'ini', title:'観察', icon:'🔍', points:[
     '気道・呼吸・循環・意識（ABCD）の評価は適切か',
     '事案に合わせた観察ができているか',
-    '初期評価・観察結果の対応は適切か',
+    '初期評価・全身観察は適切か',
   ]},
   { id:'cpr', title:'ハイパフォーマンスCPR', icon:'💓', points:[
     '人工呼吸・量・リズムは適正か',
@@ -341,15 +344,16 @@ const SECTIONS = [
 
 // 評価の選択肢
 const CHOICES = [
-  { val:'適切',   cls:'btn-ok' },
-  { val:'不適切', cls:'btn-ng' },
+  { val:'いいね！', cls:'btn-ok' },
+  { val:'おしい',   cls:'btn-mid' },
+  { val:'もう少し', cls:'btn-ng' },
   { val:'該当なし', cls:'btn-na' },
 ];
 
 // ============================================================
 // 状態管理
 // ============================================================
-const answers = {}; // secId → "適切"|"不適切"|"該当なし"
+const answers = {}; // secId → "いいね！"|"おしい"|"もう少し"|"該当なし"
 
 // タイマー状態
 const timers = { contact: null, depart: null, sceneOut: null, hospital: null };
@@ -454,18 +458,12 @@ function buildBasicInfo() {
           <input type="text" id="evaluator" placeholder="氏名">
         </div>
         <div class="field">
-          <div class="field-label">隊長</div>
-          <input type="text" id="leader" placeholder="氏名">
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <div class="field-label">隊員１</div>
-          <input type="text" id="member1" placeholder="氏名">
-        </div>
-        <div class="field">
-          <div class="field-label">隊員２</div>
-          <input type="text" id="member2" placeholder="氏名">
+          <div class="field-label">区分</div>
+          <select id="evalType">
+            <option value="">選択</option>
+            <option value="指導救命士">指導救命士</option>
+            <option value="訓練見取り">訓練見取り</option>
+          </select>
         </div>
       </div>
     </div>
@@ -541,8 +539,9 @@ function buildFooter() {
 
 function buildLegend() {
   return `<div class="legend">
-    <span>🟢 <b>適切</b></span>
-    <span>🔴 <b>不適切</b></span>
+    <span>🟢 <b>いいね！</b></span>
+    <span>🟠 <b>おしい</b></span>
+    <span>🔴 <b>もう少し</b></span>
     <span>⬜ <b>該当なし</b></span>
   </div>`;
 }
@@ -559,7 +558,7 @@ function buildApp() {
     buildSubmitArea() +
     buildFooter();
 
-  // 適切／不適切／該当なし ボタンのイベント
+  // 評価ボタン（いいね！／おしい／もう少し／該当なし）のイベント
   document.querySelectorAll('.eval-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const key = btn.dataset.key;
@@ -606,10 +605,8 @@ async function submitForm() {
     date,
     unit,
     bu,
-    leader:    document.getElementById('leader').value.trim(),
-    member1:   document.getElementById('member1').value.trim(),
-    member2:   document.getElementById('member2').value.trim(),
     evaluator: document.getElementById('evaluator').value.trim(),
+    evalType:  document.getElementById('evalType').value,
     items: itemValues,
     timerContact:  fmtHMS(timers.contact),
     timerDepart:   fmtHMS(timers.depart),
@@ -650,6 +647,7 @@ async function submitForm() {
 function nextScenario() {
   // 引き継ぐ値を退避
   const keepEvaluator = document.getElementById('evaluator').value;
+  const keepEvalType  = document.getElementById('evalType').value;
 
   // 評価・タイマーの状態をクリア
   Object.keys(answers).forEach(k => delete answers[k]);
@@ -658,8 +656,9 @@ function nextScenario() {
   // 画面を最初から作り直す（入力欄・ボタン状態もすべて初期化）
   buildApp();
 
-  // 評価者氏名だけ復元
+  // 評価者氏名・区分だけ復元
   document.getElementById('evaluator').value = keepEvaluator;
+  document.getElementById('evalType').value = keepEvalType;
 
   // 先頭までスクロール
   window.scrollTo({ top: 0, behavior: 'smooth' });
