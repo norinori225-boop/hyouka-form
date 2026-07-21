@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>訓練評価シート</title>
+  <title>救急訓練評価アプリ</title>
   <style>
     :root {
       --red: #c0392b;
+      --amber: #f59e0b;
       --green: #27ae60;
       --gray: #95a5a6;
       --bg: #f2f3f5;
@@ -136,11 +137,11 @@
     .btn-group { display: flex; gap: 6px; }
     .eval-btn {
       flex: 1;
-      padding: 11px 1px;
+      padding: 11px 2px;
       border: 2px solid var(--border);
       border-radius: 10px;
       background: white;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
@@ -154,8 +155,8 @@
 
     .btn-ok { border-color: #bbf7d0; color: var(--green); }
     .btn-ok.sel { background: var(--green); color: white; border-color: var(--green); }
-    .btn-mid { border-color: #fde68a; color: #d97706; }
-    .btn-mid.sel { background: #f59e0b; color: white; border-color: #f59e0b; }
+    .btn-mid { border-color: #fde68a; color: var(--amber); }
+    .btn-mid.sel { background: var(--amber); color: white; border-color: var(--amber); }
     .btn-ng { border-color: #fecaca; color: var(--red); }
     .btn-ng.sel { background: var(--red); color: white; border-color: var(--red); }
     .btn-na { border-color: #e5e7eb; color: var(--gray); }
@@ -286,7 +287,7 @@
 <body>
 
 <div class="app-header">
-  <h1>🚑 訓練評価シート</h1>
+  <h1>🚑 救急訓練評価アプリ</h1>
   <div class="score-pill" id="scoreHeader">0 / 6 項目</div>
 </div>
 
@@ -298,10 +299,10 @@
 // ★★ ここを変更 ★★
 //   Google Apps Script をデプロイしたら、下のURLを書き換える
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbx9Xf656LMDa-eWHbDyqDJBaaWEE-pEw8DK2NA-gEVlzF4eA2QXw6KsMq51PPzaUlFGtw/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxGCqj_CRlvNQW3W9FsqTBWL-vbxtVHvkPtI_VzwKsj616ap8-KtcGByTqFlhwe0zjp4Q/exec';
 
 // ============================================================
-// 評価セクション定義（大項目のみ・3段階評価）
+// 評価セクション定義（大項目のみ・4段階評価）
 //   points … 評価の目安（採点対象外の参考項目）
 // ============================================================
 const SECTIONS = [
@@ -342,7 +343,7 @@ const SECTIONS = [
   ]},
 ];
 
-// 評価の選択肢
+// 評価の選択肢（4段階）
 const CHOICES = [
   { val:'いいね！', cls:'btn-ok' },
   { val:'おしい',   cls:'btn-mid' },
@@ -421,25 +422,9 @@ function buildBasicInfo() {
           <div class="field-label">実施隊</div>
           <select id="unit">
             <option value="">選択</option>
-            <option value="沼津北１">沼津北１</option>
-            <option value="沼津北２">沼津北２</option>
-            <option value="原">原</option>
-            <option value="沼津南">沼津南</option>
-            <option value="静浦">静浦</option>
-            <option value="西浦">西浦</option>
-            <option value="戸田">戸田</option>
-            <option value="清水町１">清水町１</option>
-            <option value="清水町２">清水町２</option>
-            <option value="田方北">田方北</option>
-            <option value="田方中１">田方中１</option>
-            <option value="田方中２">田方中２</option>
-            <option value="田方南">田方南</option>
-            <option value="田方西">田方西</option>
-            <option value="伊東">伊東</option>
-            <option value="八幡野">八幡野</option>
-            <option value="宇佐美">宇佐美</option>
-            <option value="吉田">吉田</option>
-            <option value="東伊豆">東伊豆</option>
+            <option value="○○署">○○署</option>
+            <option value="△△署">△△署</option>
+            <option value="□□署">□□署</option>
           </select>
         </div>
         <div class="field">
@@ -459,7 +444,7 @@ function buildBasicInfo() {
         </div>
         <div class="field">
           <div class="field-label">区分</div>
-          <select id="evalType">
+          <select id="category">
             <option value="">選択</option>
             <option value="指導救命士">指導救命士</option>
             <option value="訓練見取り">訓練見取り</option>
@@ -529,8 +514,6 @@ function buildSubmitArea() {
 function buildFooter() {
   return `
   <div class="app-footer">
-    <span>駿東伊豆消防本部</span>
-    <span class="sep">/</span>
     <span>Ver.2.1</span>
     <span class="sep">/</span>
     <span>2026年7月</span>
@@ -540,7 +523,7 @@ function buildFooter() {
 function buildLegend() {
   return `<div class="legend">
     <span>🟢 <b>いいね！</b></span>
-    <span>🟠 <b>おしい</b></span>
+    <span>🟡 <b>おしい</b></span>
     <span>🔴 <b>もう少し</b></span>
     <span>⬜ <b>該当なし</b></span>
   </div>`;
@@ -606,7 +589,7 @@ async function submitForm() {
     unit,
     bu,
     evaluator: document.getElementById('evaluator').value.trim(),
-    evalType:  document.getElementById('evalType').value,
+    category:  document.getElementById('category').value,
     items: itemValues,
     timerContact:  fmtHMS(timers.contact),
     timerDepart:   fmtHMS(timers.depart),
@@ -642,12 +625,12 @@ async function submitForm() {
 }
 
 // ============================================================
-//  次の想定へ（評価者氏名だけ引き継いでリセット）
+//  次の想定へ（評価者氏名・区分だけ引き継いでリセット）
 // ============================================================
 function nextScenario() {
   // 引き継ぐ値を退避
   const keepEvaluator = document.getElementById('evaluator').value;
-  const keepEvalType  = document.getElementById('evalType').value;
+  const keepCategory  = document.getElementById('category').value;
 
   // 評価・タイマーの状態をクリア
   Object.keys(answers).forEach(k => delete answers[k]);
@@ -658,7 +641,7 @@ function nextScenario() {
 
   // 評価者氏名・区分だけ復元
   document.getElementById('evaluator').value = keepEvaluator;
-  document.getElementById('evalType').value = keepEvalType;
+  document.getElementById('category').value  = keepCategory;
 
   // 先頭までスクロール
   window.scrollTo({ top: 0, behavior: 'smooth' });
