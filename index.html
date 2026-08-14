@@ -444,7 +444,7 @@ function buildBasicInfo() {
         </div>
         <div class="field">
           <div class="field-label">区分</div>
-          <select id="category">
+          <select id="evalType">
             <option value="">選択</option>
             <option value="指導救命士">指導救命士</option>
             <option value="訓練見取り">訓練見取り</option>
@@ -589,7 +589,7 @@ async function submitForm() {
     unit,
     bu,
     evaluator: document.getElementById('evaluator').value.trim(),
-    category:  document.getElementById('category').value,
+    evalType:  document.getElementById('evalType').value,
     items: itemValues,
     timerContact:  fmtHMS(timers.contact),
     timerDepart:   fmtHMS(timers.depart),
@@ -630,7 +630,7 @@ async function submitForm() {
 function nextScenario() {
   // 引き継ぐ値を退避
   const keepEvaluator = document.getElementById('evaluator').value;
-  const keepCategory  = document.getElementById('category').value;
+  const keepCategory  = document.getElementById('evalType').value;
 
   // 評価・タイマーの状態をクリア
   Object.keys(answers).forEach(k => delete answers[k]);
@@ -641,7 +641,7 @@ function nextScenario() {
 
   // 評価者氏名・区分だけ復元
   document.getElementById('evaluator').value = keepEvaluator;
-  document.getElementById('category').value  = keepCategory;
+  document.getElementById('evalType').value  = keepCategory;
 
   // 先頭までスクロール
   window.scrollTo({ top: 0, behavior: 'smooth' });
